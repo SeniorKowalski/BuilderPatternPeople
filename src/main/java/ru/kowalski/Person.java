@@ -1,23 +1,23 @@
 package ru.kowalski;
 
-import lombok.Builder;
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
-
 import java.util.Optional;
 
-@ToString
-@EqualsAndHashCode
-@Builder(setterPrefix = "set", builderClassName = "PersonBuilder")
 public class Person {
 
-    protected final String name;
-    protected final String surname;
+    private final String name;
+    private final String surname;
     private Integer age;
     private String address;
 
+    public Person(String name, String surname, Integer age, String address) {
+        this.name = name;
+        this.surname = surname;
+        this.age = age;
+        this.address = address;
+    }
+
     public String getName() {
-        return name;
+        return Optional.ofNullable(this.name).orElseThrow(() -> new IllegalArgumentException("Имя не указано"));
     }
 
     public String getSurname() {
@@ -48,27 +48,17 @@ public class Person {
         return address != null;
     }
 
+    @Override
+    public String toString() {
+        return "Person{" +
+                "name='" + name + '\'' +
+                ", surname='" + surname + '\'' +
+                ", age=" + age +
+                ", address='" + address + '\'' +
+                '}';
+    }
+
     public PersonBuilder newChildBuilder() {
-        return Person.builder().setSurname(this.surname).setAge(0).setAddress(this.address);
-    }
-
-    public PersonBuilder Builder() {
-        return new CustomPersonBuilder();
-    }
-
-    private class CustomPersonBuilder extends PersonBuilder {
-        @Override
-        public Person build() {
-            Optional.ofNullable(surname).orElseThrow(() -> new IllegalArgumentException("Не хватает обязательных полей. Используйте .setSurname"));
-            return super.build();
-        }
-    }
-
-    public static class PersonBuilder {
-        public PersonBuilder setAge(int age) {
-            if (age >= 0) this.age = age;
-            else throw new IllegalArgumentException("Введён недопустимый возраст ");
-            return this;
-        }
+        return PersonBuilder.builder().setSurname(this.surname).setAge(0).setAddress(this.address);
     }
 }
